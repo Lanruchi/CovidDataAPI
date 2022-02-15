@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CovidDataApi</name>
+    </assembly>
+    <members>
+        <member name="M:CovidDataApi.Controllers.CovidController.GetCovidData(CovidDataApi.Domain.Filter)">
+            <summary>
+            Get list of Covid 19 data
+            </summary>
+            <param name="filter"> The location and date range needed for filtered data</param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidDataApi.Repository.CovidDataRepo.GetCovidData">
+            <summary>
+             download a fresh copy locally if not exist in folder path OR
+             if file exist but date of original file is pver 24 hrs
+            </summary>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
