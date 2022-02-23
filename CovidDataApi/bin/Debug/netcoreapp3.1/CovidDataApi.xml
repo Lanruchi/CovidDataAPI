@@ -11,6 +11,20 @@
             <param name="filter"> The location and date range needed for filtered data</param>
             <returns></returns>
         </member>
+        <member name="M:CovidDataApi.Controllers.CovidController.GetDailyBreakDown(CovidDataApi.Domain.Filter)">
+            <summary>
+            Get list of both total cases AND new cases each day
+            </summary>
+            <param name="filter"> The location and date range needed for filtered data</param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidDataApi.Controllers.CovidController.GetGrowthRate(CovidDataApi.Domain.Filter)">
+            <summary>
+            Get growth rate of new cases
+            </summary>
+            <param name="filter"> The location and date range needed for filtered data</param>
+            <returns></returns>
+        </member>
         <member name="M:CovidDataApi.Repository.CovidDataRepo.GetCovidData">
             <summary>
              download a fresh copy locally if not exist in folder path OR

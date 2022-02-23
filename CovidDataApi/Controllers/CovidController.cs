@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace CovidDataApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class CovidController : ControllerBase
     {
@@ -35,6 +35,48 @@ namespace CovidDataApi.Controllers
         {
             var data = _service.GetCovidDataAsync(filter).Result;
             if(data == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// Get list of both total cases AND new cases each day
+        /// </summary>
+        /// <param name="filter"> The location and date range needed for filtered data</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<IDictionary<string, string>>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult GetDailyBreakDown(Filter filter)
+        {
+            var data = _service.GetCovidDataDailyBreakDown(filter).Result;
+            if (data == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// Get growth rate of new cases
+        /// </summary>
+        /// <param name="filter"> The location and date range needed for filtered data</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<IDictionary<string, string>>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult GetGrowthRate(Filter filter)
+        {
+            var data = _service.GetCovidRateOfNewCases(filter).Result;
+            if (data == null)
             {
                 return NotFound();
             }

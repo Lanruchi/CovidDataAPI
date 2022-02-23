@@ -9,7 +9,7 @@ namespace CovidDataApi.Services
     public interface ICovidDataService
     {
         Task<IEnumerable<IDictionary<string, string>>> GetCovidDataAsync(Filter filter);
-        Task<IEnumerable<IDictionary<string, string>>> GetCovidDataDailyBreakDown();
-        Task<IEnumerable<IDictionary<string, string>>> GetCovidRateOfNewCases();
+        Task<IEnumerable<IDictionary<string, string>>> GetCovidDataDailyBreakDown(Filter filter);
+        Task<IEnumerable<IDictionary<string, string>>> GetCovidRateOfNewCases(Filter filter);
     }
 }

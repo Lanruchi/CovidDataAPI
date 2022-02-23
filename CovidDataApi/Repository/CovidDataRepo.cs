@@ -27,134 +27,126 @@ namespace CovidDataApi.Repository
 
         public async Task<IEnumerable<IDictionary<string, string>>> GetCovidDataByLocationAsync(Filter filter)
         {
-            try
+
+            var dataList = new List<Dictionary<string, string>>();
+            DateTime startDate = new DateTime();
+            DateTime endDate = new DateTime();
+            filter.Location = filter.Location.Trim();
+
+            if (string.IsNullOrEmpty(filter.Location))
             {
-                var dataList = new List<Dictionary<string, string>>();
-                DateTime startDate = new DateTime();
-                DateTime endDate = new DateTime();
-                filter.Location = filter.Location.Trim();
-
-                if (string.IsNullOrEmpty(filter.Location))
-                {
-                    throw new ArgumentException(nameof(filter.Location));
-                }
-                else
-                {
-                    if (!string.IsNullOrEmpty(filter.FromDate) && !DateTime.TryParse(filter.FromDate, out startDate))
-                    {
-                        throw new ArgumentException(nameof(filter.FromDate));
-                    }
-                    if (!string.IsNullOrEmpty(filter.ToDate) && !DateTime.TryParse(filter.ToDate, out endDate))
-                    {
-                        throw new ArgumentException(nameof(filter.ToDate));
-                    }
-                }
-
-                var data = await GetCovidData();
-
-                string jsonString = SerializeToJson(data);
-                var deserialized = Newtonsoft.Json.JsonConvert.DeserializeObject<IEnumerable<IDictionary<string, string>>>(jsonString);
-
-
-                if (startDate != default(DateTime) && endDate != default(DateTime))
-                {
-                    string sDate = startDate.ToString("MM/dd/yy");
-                    string eDate = endDate.ToString("MM/dd/yy");
-
-                    foreach (var item in deserialized)
-                    {
-                        foreach (var keyValue in item)
-                        {
-                            if (Regex.IsMatch(keyValue.Key, @"^\d"))
-                            {
-                                var dateKey = DateTime.Parse(keyValue.Key).ToString("M/d/yy");
-                                if (DateTime.Parse(dateKey) < DateTime.Parse(sDate) ||
-                                    DateTime.Parse(dateKey) > DateTime.Parse(eDate))
-                                {
-                                    item.Remove(dateKey);
-                                }
-                            }
-
-                            if (keyValue.Value == filter.Location)
-                            {
-                                dataList.Add((Dictionary<string, string>)item);
-                            }
-                        }
-
-                    }
-                }
-                else if (startDate == default(DateTime) && endDate == default(DateTime))
-                {
-                    foreach (var item in deserialized)
-                    {
-                        foreach (var keyValue in item)
-                        {
-                            if (keyValue.Value == filter.Location)
-                            {
-                                dataList.Add((Dictionary<string, string>)item);
-                            }
-                        }
-
-                    }
-                }
-
-                else if (startDate != default(DateTime) && endDate == default(DateTime))
-                {
-                    string sDate = startDate.ToString("MM/dd/yy");
-                    foreach (var item in deserialized)
-                    {
-                        foreach (var keyValue in item)
-                        {
-                            if (Regex.IsMatch(keyValue.Key, @"^\d"))
-                            {
-                                var dateKey = DateTime.Parse(keyValue.Key).ToString("M/d/yy");
-                                if (DateTime.Parse(dateKey) < DateTime.Parse(sDate))
-                                {
-                                    item.Remove(dateKey);
-                                }
-                            }
-
-                            if (keyValue.Value == filter.Location)
-                            {
-                                dataList.Add((Dictionary<string, string>)item);
-                            }
-                        }
-
-                    }
-                }
-
-                else if (startDate == default(DateTime) && endDate != default(DateTime))
-                {
-                    string eDate = endDate.ToString("M/d/yy");
-                    foreach (var item in deserialized)
-                    {
-                        foreach (var keyValue in item)
-                        {
-                            if (Regex.IsMatch(keyValue.Key, @"^\d"))
-                            {
-                                var dateKey = DateTime.Parse(keyValue.Key).ToString("M/d/yy");
-                                if (DateTime.Parse(dateKey) > DateTime.Parse(eDate))
-                                {
-                                    item.Remove(dateKey);
-                                }
-                            }
-
-                            if (keyValue.Value == filter.Location)
-                            {
-                                dataList.Add((Dictionary<string, string>)item);
-                            }
-                        }
-
-                    }
-                }
-                return dataList;
+                throw new ArgumentException(nameof(filter.Location));
             }
-            catch (Exception e)
+            else
             {
-                //LOG ERROR in persistence place
-                Console.WriteLine(e.Message);
-                return null;
+                if (!string.IsNullOrEmpty(filter.FromDate) && !DateTime.TryParse(filter.FromDate, out startDate))
+                {
+                    throw new ArgumentException(nameof(filter.FromDate));
+                }
+                if (!string.IsNullOrEmpty(filter.ToDate) && !DateTime.TryParse(filter.ToDate, out endDate))
+                {
+                    throw new ArgumentException(nameof(filter.ToDate));
+                }
             }
+
+            var data = await GetCovidData();
+
+            string jsonString = SerializeToJson(data);
+            var deserialized = Newtonsoft.Json.JsonConvert.DeserializeObject<IEnumerable<IDictionary<string, string>>>(jsonString);
+
+
+            if (startDate != default(DateTime) && endDate != default(DateTime))
+            {
+                string sDate = startDate.ToString("MM/dd/yy");
+                string eDate = endDate.ToString("MM/dd/yy");
+
+                foreach (var item in deserialized)
+                {
+                    foreach (var keyValue in item)
+                    {
+                        if (Regex.IsMatch(keyValue.Key, @"^\d"))
+                        {
+                            var dateKey = DateTime.Parse(keyValue.Key).ToString("M/d/yy");
+                            if (DateTime.Parse(dateKey) < DateTime.Parse(sDate) ||
+                                DateTime.Parse(dateKey) > DateTime.Parse(eDate))
+                            {
+                                item.Remove(dateKey);
+                            }
+                        }
+
+                        if (keyValue.Value == filter.Location)
+                        {
+                            dataList.Add((Dictionary<string, string>)item);
+                        }
+                    }
+
+                }
+            }
+            else if (startDate == default(DateTime) && endDate == default(DateTime))
+            {
+                foreach (var item in deserialized)
+                {
+                    foreach (var keyValue in item)
+                    {
+                        if (keyValue.Value == filter.Location)
+                        {
+                            dataList.Add((Dictionary<string, string>)item);
+                        }
+                    }
+
+                }
+            }
+
+            else if (startDate != default(DateTime) && endDate == default(DateTime))
+            {
+                string sDate = startDate.ToString("MM/dd/yy");
+                foreach (var item in deserialized)
+                {
+                    foreach (var keyValue in item)
+                    {
+                        if (Regex.IsMatch(keyValue.Key, @"^\d"))
+                        {
+                            var dateKey = DateTime.Parse(keyValue.Key).ToString("M/d/yy");
+                            if (DateTime.Parse(dateKey) < DateTime.Parse(sDate))
+                            {
+                                item.Remove(dateKey);
+                            }
+                        }
+
+                        if (keyValue.Value == filter.Location)
+                        {
+                            dataList.Add((Dictionary<string, string>)item);
+                        }
+                    }
+
+                }
+            }
+
+            else if (startDate == default(DateTime) && endDate != default(DateTime))
+            {
+                string eDate = endDate.ToString("M/d/yy");
+                foreach (var item in deserialized)
+                {
+                    foreach (var keyValue in item)
+                    {
+                        if (Regex.IsMatch(keyValue.Key, @"^\d"))
+                        {
+                            var dateKey = DateTime.Parse(keyValue.Key).ToString("M/d/yy");
+                            if (DateTime.Parse(dateKey) > DateTime.Parse(eDate))
+                            {
+                                item.Remove(dateKey);
+                            }
+                        }
+
+                        if (keyValue.Value == filter.Location)
+                        {
+                            dataList.Add((Dictionary<string, string>)item);
+                        }
+                    }
+
+                }
+            }
+            return dataList;
         }
 
         /// <summary>
